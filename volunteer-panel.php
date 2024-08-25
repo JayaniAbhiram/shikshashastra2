@@ -672,7 +672,7 @@ function validateBookingForm() {
     </script>
 
 
-    <div class="home-content" id="uploaddocuments">
+<div class="home-content" id="uploaddocuments">
     <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #e0e0e0;">
         <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); width: 90%; max-width: 600px;">
             <h1 style="text-align: center; color: #333;">Upload Volunteer Documents</h1>
@@ -697,18 +697,11 @@ function validateBookingForm() {
                 </button>
             </form>
             <?php
+            include("connect.php");
+
             if (isset($_POST['upload'])) {
                 $name = $_POST['name'];
                 $gmail = $_POST['gmail'];
-
-                // Database connection
-                // $servername = "localhost";
-                // $username = "root";
-                // $password = "";
-                // $dbname = "shikshashastra1";
-
-                // // Create connection
-                // $conn = new mysqli($servername, $username, $password, $dbname);
 
                 // Check connection
                 if ($con->connect_error) {
@@ -717,13 +710,13 @@ function validateBookingForm() {
 
                 // Check if name or gmail already exists
                 $checkQuery = "SELECT id FROM volunteer_documents WHERE name = ? OR gmail = ?";
-                $stmtCheck = $conn->prepare($checkQuery);
+                $stmtCheck = $con->prepare($checkQuery);
                 $stmtCheck->bind_param("ss", $name, $gmail);
                 $stmtCheck->execute();
                 $stmtCheck->store_result();
 
                 if ($stmtCheck->num_rows > 0) {
-                    echo "<script>showAlert('Documents already uploaded with this name or Gmail.');</script>";
+                    echo "<script>alert('Documents already uploaded with this name or Gmail.');</script>";
                 } else {
                     // Directory for uploads
                     $uploadDir = 'uploads/';
@@ -735,19 +728,19 @@ function validateBookingForm() {
                     $file1Path = $file2Path = $file3Path = '';
 
                     // File 1 upload
-                    if (isset($_FILES['file1'])) {
+                    if ($_FILES['file1']['error'] == 0) {
                         $file1Path = $uploadDir . basename($_FILES['file1']['name']);
                         move_uploaded_file($_FILES['file1']['tmp_name'], $file1Path);
                     }
 
                     // File 2 upload
-                    if (isset($_FILES['file2'])) {
+                    if ($_FILES['file2']['error'] == 0) {
                         $file2Path = $uploadDir . basename($_FILES['file2']['name']);
                         move_uploaded_file($_FILES['file2']['tmp_name'], $file2Path);
                     }
 
                     // File 3 upload
-                    if (isset($_FILES['file3'])) {
+                    if ($_FILES['file3']['error'] == 0) {
                         $file3Path = $uploadDir . basename($_FILES['file3']['name']);
                         move_uploaded_file($_FILES['file3']['tmp_name'], $file3Path);
                     }
@@ -759,7 +752,7 @@ function validateBookingForm() {
 
                     // Execute and check success
                     if ($stmtInsert->execute()) {
-                        echo "<script>showAlert('Documents successfully submitted and inserted into the database.');</script>";
+                        echo "<script>alert('Documents successfully submitted and inserted into the database.');</script>";
                     } else {
                         echo "<p style='color: #dc3545; text-align: center;'>Error: " . $stmtInsert->error . "</p>";
                     }
@@ -772,6 +765,10 @@ function validateBookingForm() {
                 $con->close();
             }
             ?>
+        </div>
+    </div>
+</div>
+
         </div>
     </div>
       
